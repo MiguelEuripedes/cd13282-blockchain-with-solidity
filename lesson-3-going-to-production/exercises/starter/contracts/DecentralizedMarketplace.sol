@@ -5,7 +5,7 @@ pragma solidity ^0.8.19;
 contract DecentralizedMarketplace {
     struct Item {
         uint id;
-        address payable seller;
+        address payable seller; // Allows to send ether to the address stored in these variables
         string name;
         uint price;
         bool available;
@@ -18,17 +18,22 @@ contract DecentralizedMarketplace {
         uint rating; // Rating out of 5
     }
 
+    // Mapping the address for items and reviews
+    // we are mapping each item and review and assigning each of them 
+    // it's own unique Id
     address public owner;
     mapping(uint => Item) public items;
     mapping(uint => Review[]) public reviews;
     uint public itemCount = 0;
 
+    // Events declaration that can be emitted on actions.
     event ItemListed(uint indexed itemId, address indexed seller, string name, uint price);
     event ItemPurchased(uint indexed itemId, address indexed buyer, uint price);
     event ReviewAdded(uint indexed itemId, address reviewer, uint rating);
 
+    // Constructor for setting the creator as the owner of the contract
     constructor() {
-        owner = msg.sender;
+        owner = msg.sender; // This establishes the deployer as the owner of the marketplace
     }
 
     modifier onlyOwner() {
@@ -36,12 +41,13 @@ contract DecentralizedMarketplace {
         _;
     }
 
+    // Function to list a new item on the marketplace
     function listItem(string memory _name, uint _price) public {
         require(_price > 0, "Price must be greater than 0");
         itemCount++;
         items[itemCount] = Item({
-            id: itemCount,
-            seller: payable(msg.sender),
+            id: itemCount, // We need the Item ID
+            seller: payable(msg.sender), // The seller Address
             name: _name,
             price: _price,
             available: true
